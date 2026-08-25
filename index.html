@@ -455,17 +455,23 @@ document.getElementById('btn-salir-admin').onclick = () => {
 document.getElementById('btn-escanear').onclick = async () => {
   document.getElementById('btn-escanear').classList.add('hidden');
   document.getElementById('btn-detener-scan').classList.remove('hidden');
-  html5QrCode = new Html5Qrcode("reader");
-  const config = {
-    fps: 10,
-    qrbox: { width: 260, height: 140 },
+  html5QrCode = new Html5Qrcode("reader", {
     formatsToSupport: [
       Html5QrcodeSupportedFormats.EAN_13,
       Html5QrcodeSupportedFormats.EAN_8,
       Html5QrcodeSupportedFormats.CODE_128,
+      Html5QrcodeSupportedFormats.CODE_39,
       Html5QrcodeSupportedFormats.UPC_A,
       Html5QrcodeSupportedFormats.UPC_E
-    ]
+    ],
+    useBarCodeDetectorIfSupported: true,
+    experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+    verbose: false
+  });
+  const config = {
+    fps: 15,
+    qrbox: { width: 300, height: 130 },
+    disableFlip: false
   };
   try {
     await html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess);
@@ -487,6 +493,7 @@ function detenerScanner(){
 }
 
 async function onScanSuccess(decodedText){
+  if(navigator.vibrate) navigator.vibrate(120);
   detenerScanner();
   await manejarCodigoEscaneado(decodedText.trim());
 }
